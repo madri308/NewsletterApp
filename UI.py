@@ -1,6 +1,9 @@
 import wx
 import wx.richtext as rt
 import wx.lib.scrolledpanel as scrolled
+import FileManager
+
+HTML_WILDCARD = "HTML files (*.html)|*.html"
 
 def new_button(panel, label, event):
     button = wx.Button(panel, label=label)
@@ -62,8 +65,8 @@ class MainFrame(wx.Frame):
         self.recipients_panel, recipients_sizer = self.create_column("Recipients Groups",  self.window_1)
         display_panel_sizer.Add(self.recipients_panel, 1, wx.EXPAND)
 
-        # IMPLEMENT LOAD DATA
-        self.recipients_data = []  # Load data from JSON or initialize an empty list
+        # LOAD DATA
+        self.recipients_data = FileManager.load_data() or []  # Load data from JSON or initialize an empty list
         self.update_recipients_panel(recipients_sizer)  # Create RecipientPanel instances and add to the recipients column
         
         # Email Column
@@ -89,12 +92,11 @@ class MainFrame(wx.Frame):
 
         # CREATE BUTTONS AND LABELS
         html_loaded_label = wx.StaticText(self.buttons_panel, label="")
-        css_loaded_label = wx.StaticText(self.buttons_panel, label="")
 
         create_button = new_button(self.buttons_panel, "Create group", self.on_create)
         remove_button = new_button(self.buttons_panel, "Remove group", self.on_remove)
-        browse_button = new_button(self.buttons_panel, "Browse mail", lambda event: self.on_browse(body_text, html_loaded_label, css_loaded_label))
-        open_button = new_button(self.buttons_panel, "Open HTML", self.open_html_file)
+        browse_button = new_button(self.buttons_panel, "Browse mail", lambda event: self.on_browse(body_text, html_loaded_label))
+        open_button = new_button(self.buttons_panel, "Open HTML", self.preview_html_file)
 
         buttons_panel_sizer.Add(create_button, 0, wx.ADJUST_MINSIZE | wx.ALL, border=5)
         buttons_panel_sizer.Add(remove_button, 0, wx.ADJUST_MINSIZE | wx.ALL, border=5)
@@ -104,7 +106,6 @@ class MainFrame(wx.Frame):
         buttons_panel_sizer.AddStretchSpacer()
 
         buttons_panel_sizer.Add(html_loaded_label, 0, wx.EXPAND | wx.ALL, border=5)
-        buttons_panel_sizer.Add(css_loaded_label, 0, wx.EXPAND | wx.ALL, border=5)
 
         self.buttons_panel.SetSizerAndFit(buttons_panel_sizer)
         box.Add(self.buttons_panel, 0, wx.EXPAND)
@@ -115,10 +116,9 @@ class MainFrame(wx.Frame):
         self.SetTitle('Newsletter App')
         self.Centre()
 
-    def open_html_file(self, event):
+    def preview_html_file(self, event):
         html_content = self.body_panel.GetSizer().GetChildren()[4].GetWindow().Value
-
-        # IMPLEMENT OPEN FILE
+        FileManager.open_html_in_browser(html_content)
 
     def create_column(self, label, panel):
         scrolled_panel = scrolled.ScrolledPanel(panel, -1, style = wx.TAB_TRAVERSAL|wx.SUNKEN_BORDER|wx.ALIGN_LEFT, name="panel1")
@@ -131,15 +131,18 @@ class MainFrame(wx.Frame):
 
         return (scrolled_panel, sizer)
 
-    def on_browse(self, target_text_ctrl, html_loaded_label, css_loaded_label):
-        html_wildcard = "HTML files (*.html)|*.html"
-        dialog = wx.FileDialog(self, "Choose a file", wildcard=html_wildcard, style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+    def on_browse(self, target_text_ctrl, html_loaded_label):
+        dialog = wx.FileDialog(self, "Choose a file", wildcard=HTML_WILDCARD, style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
 
         if dialog.ShowModal() == wx.ID_OK:
             file_path = dialog.GetPath()
             dialog.Destroy()
-            return  
-            # IMPLEMENT CREATE AND SHOW HTML
+            html_content, html_name, html_path = FileManager.get_html_data(file_path)
+            if html_content:
+                modified_html_content = FileManager.integrate_css(html_content, html_path)
+                html_loaded_label.SetLabel('%s loaded with all the linked styles' % html_name)
+                target_text_ctrl.SetValue(modified_html_content)
+            self.buttons_panel.Layout()
     
     def on_create(self, event):
         # Show a dialog to get user input for new recipient
@@ -192,7 +195,8 @@ class MainFrame(wx.Frame):
             separator = wx.StaticLine(self.recipients_panel, style=wx.LI_HORIZONTAL)
             recipients_sizer.Add(separator, 0, wx.EXPAND | wx.ALL, border=3)
 
-        # IMPLEMENT Save data to JSON
+        # Save data to JSON
+        FileManager.save_data(self.recipients_data)
 
         # Refresh the panel
         self.recipients_panel.Layout()
