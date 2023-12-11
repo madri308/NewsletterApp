@@ -9,9 +9,11 @@ This is a mac application useful to send html newsletters via outlook.
 - Merge styles linked to the html automatically.
 - Open/Send the mail with outlook.
 - Visualize the mail with a browser.
-- Load a signature, for this you should create a signature with no images called "StandardNoImages"
+- Load a signature, for this you should create a signature with no images called "StandardNoImages".
 
 ## How to run it:
+
+### Manually
 
 Install the reqs
 
@@ -24,6 +26,10 @@ Run the next command in the project root folder
 ```
 python3 NewsletterApp.py
 ```
+
+### Application
+
+Download and run [```NewsletterApp.app```](NewsletterApp.app)
 
 ## Tech details
 
