@@ -54,6 +54,6 @@ If the app is not sending/opening the mail, go to System Settings -> Privacy & S
 ]
 ```
 
-### How the app access Outlook without credentixals
+### How the app access Outlook without credentials
 
 We use a library called appscript, you can check the things you can do with it by opening the Script Editor -> File -> Open Dictionary and selecting any application
