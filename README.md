@@ -29,7 +29,7 @@ python3 NewsletterApp.py
 
 ### Application
 
-Download and run [```NewsletterApp.app```](NewsletterApp.app)
+Download and run [```NewsletterApp```](https://github.com/madri308/NewsletterApp/raw/main/NewsletterApp)
 
 ## Tech details
 
