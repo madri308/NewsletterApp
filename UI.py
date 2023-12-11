@@ -2,6 +2,7 @@ import wx
 import wx.richtext as rt
 import wx.lib.scrolledpanel as scrolled
 import FileManager
+import MailManager
 
 HTML_WILDCARD = "HTML files (*.html)|*.html"
 
@@ -40,12 +41,21 @@ class RecipientPanel(wx.Panel):
         result = wx.MessageBox(message, caption, style)
         if result == wx.YES:
             body_panel_children = self.main_frame.body_panel.GetSizer().GetChildren()
-            # IMPLEMENT SEND MAIL FUNCTION
+            MailManager.send_message_with_app(
+                str(body_panel_children[1].GetWindow().Value),
+                str(body_panel_children[4].GetWindow().Value),
+                to_recip=self.to_recipient.split(","),
+                cc_recip=self.cc_recipient.split(",")
+            )
 
     def open_mail(self, event):
         body_panel_children = self.main_frame.body_panel.GetSizer().GetChildren()
-
-        # IMPLEMENT OPEN MAIL FUNCTION
+        MailManager.open_message_with_app(
+            str(body_panel_children[1].GetWindow().Value),
+            str(body_panel_children[4].GetWindow().Value),
+            to_recip=self.to_recipient.split(","),
+            cc_recip=self.cc_recipient.split(",")
+        )
 
 class MainFrame(wx.Frame):
     def __init__(self, *args, **kw):
