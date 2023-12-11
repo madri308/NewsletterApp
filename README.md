@@ -29,7 +29,7 @@ python3 NewsletterApp.py
 
 ### Application
 
-Download, open and run [```NewsletterApp.zip```](https://github.com/madri308/NewsletterApp/raw/main/NewsletterApp.zip)
+Download and run ```NewsletterApp.app```
 
 If the app is not sending/opening the mail, go to System Settings -> Privacy & Security and check the Automation section
 
